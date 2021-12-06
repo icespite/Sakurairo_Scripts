@@ -53,6 +53,13 @@ module.exports = {
             },
             {
                 test: /\.m?js$/,
+                resolve: {
+                    fullySpecified: false
+                },
+                type: "javascript/auto"
+            },
+            {
+                test: /\.m?js$/,
                 exclude: /(node_modules)/,
                 use: {
                     loader: 'babel-loader',
@@ -79,6 +86,6 @@ module.exports = {
         entryOnly: true,
         banner: `//! build ${commitHash} ${new Date().toLocaleDateString()}`
     })],
-    target: "browserslist", 
+    target: "browserslist",
     devtool: "source-map",
 };
