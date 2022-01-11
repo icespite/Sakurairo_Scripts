@@ -36,13 +36,20 @@ function parseCSSUrl(cssText?: string) {
 export const getCurrentBG = mashiro_option.site_bg_as_cover ? () => parseCSSUrl(document.body.style.backgroundImage) :
     () => parseCSSUrl(centerbg.style.backgroundImage)
 
+// function getAPIPath(useBGN = false) {
+//     const cover_api_url = new URL(mashiro_option.cover_api)
+//     if (document.body.clientWidth < 860 && mashiro_option.random_graphs_mts == true) {
+//         cover_api_url.searchParams.set('type', 'mobile')
+//         return cover_api_url.toString() + (useBGN ? "&" + bgn : '')
+//     } else {
+//         return cover_api_url.toString() + (useBGN ? (cover_api_url.search === '' ? "?" : '&') + bgn : '');
+//     }
+// }
 function getAPIPath(useBGN = false) {
-    const cover_api_url = new URL(mashiro_option.cover_api)
-    if (document.body.clientWidth < 860 && mashiro_option.random_graphs_mts == true) {
-        cover_api_url.searchParams.set('type', 'mobile')
-        return cover_api_url.toString() + (useBGN ? "&" + bgn : '')
+    if (document.body.clientWidth < 860) {
+        return "https://cdnpicture.icespite.top/static/wallhaven-x88o53_1920x1080.png";
     } else {
-        return cover_api_url.toString() + (useBGN ? (cover_api_url.search === '' ? "?" : '&') + bgn : '');
+        return "https://cdnpicture.icespite.top/static/banner-final.jpg";
     }
 }
 export const getCoverPath = mashiro_option.cache_cover ? (useBGN = false) =>
