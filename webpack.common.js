@@ -1,18 +1,23 @@
 const define = require('./define')
 const webpack = require('webpack')
 const { commitHash } = require('./commit_hash')
+const { VueLoaderPlugin } = require('vue-loader')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 module.exports = {
     entry: {
-        app: './src/sakura-app/',
+        app: './src/app/',
         page: { import: "./src/page/", dependOn: 'app' },
-        anf:'./src/404.ts'
+        anf: './src/404.ts',
+        'page-photo': './src/page-photo'
         /* lazyload:"lazyload",
         smoothscroll:"smoothscroll-for-websites" */
         //"customizer":"./src/entries/customizer.js"
     },
     output: {
         filename: '[name].js',
-        path: define.dist_path, iife: true// 是否添加 IIFE 外层
+        assetModuleFilename: '[id][ext][query]',
+        path: define.dist_path,
+        iife: true// 是否添加 IIFE 外层
     },
     optimization: {
         /* runtimeChunk: {
@@ -46,7 +51,8 @@ module.exports = {
         rules: [
             {
                 test: /\.ts$/, use: {
-                    loader: 'ts-loader', options: {
+                    loader: 'ts-loader',
+                    options: {
                         allowTsInNodeModules: true
                     }
                 }
@@ -64,7 +70,14 @@ module.exports = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: ['@babel/preset-env'],
+                        presets: [
+                            ['@babel/preset-env',
+                                {
+                                    useBuiltIns: 'usage',
+                                    corejs: '3.20',
+                                    modules: false
+                                }
+                            ]],
                         cacheDirectory: true,
                         cacheCompression: false,
                         assumptions: {
@@ -75,17 +88,34 @@ module.exports = {
                         }
                     }
                 }
-            }
+            }, {
+                test: /\.vue$/,
+                use: [
+                    'vue-loader'
+                ]
+            }, {
+                test: /\.css$/i,
+                use: [{ loader: MiniCssExtractPlugin.loader }, "css-loader", 'postcss-loader'],
+            },
         ]
     },
     resolve: {
         extensions: ['.js', '.json', '.ts'] // 自动判断后缀名，引入时可以不带后缀
     },
-    plugins: [new webpack.BannerPlugin({
-        raw: true,
-        entryOnly: true,
-        banner: `//! build ${commitHash} ${new Date().toLocaleDateString()}`
-    })],
+    plugins: [
+        new webpack.BannerPlugin({
+            raw: true,
+            entryOnly: true,
+            banner: `/*! build ${commitHash} ${new Date().toLocaleDateString()}*/`
+        }),
+        new VueLoaderPlugin(),
+        new MiniCssExtractPlugin(),
+        /* new webpack.DefinePlugin({
+            'typeof document': JSON.stringify('object'),
+            'typeof window': JSON.stringify('object'),
+            DEBUG: undefined
+        }) */
+    ],
     target: "browserslist",
     devtool: "source-map",
 };

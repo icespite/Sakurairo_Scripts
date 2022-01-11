@@ -3,7 +3,7 @@ declare var meting_api: string;
 //@ts-ignore
 import APlayer from 'aplayer'
 import { loadCSS } from 'fg-loadcss';
-import { registerOnGlobal } from './sakurairo_global';
+import { registerOnGlobal } from '../common/sakurairo_global';
 export interface APlayerAudio {
     artist: string
     cover: string
@@ -89,6 +89,23 @@ export function destroyAllAplayer() {
         console.warn(reason)
     }
 }
+/**
+ * @return 返回曾在播放的aplayer列表
+ */
+export function pauseAllPlayer() {
+    const playingAplayer = []
+    try {
+        for (const player of aplayers) {
+            if (!player.paused) {
+                playingAplayer.push(player)
+            }
+            player.pause()
+        }
+    } catch (reason) {
+        console.warn(reason)
+    }
+    return playingAplayer
+}
 export function aplayerInit() {
     //document.addEventListener('DOMContentLoaded', loadMeting, /* !1 *//**false与什么都不传递作用相等 */);
     loadCSS("https://cdn.jsdelivr.net/gh/Fuukei/APlayer@1.10.2/dist/APlayer.min.css");
@@ -142,6 +159,8 @@ function loadAPlayer(playlist: APlayerAudio[]) {
     }
 }
 function registerMethods() {
+    registerOnGlobal('pauseAllPlayer', pauseAllPlayer)
     registerOnGlobal('destroyAllAplayer', destroyAllAplayer)
     registerOnGlobal('loadAPlayer', loadAPlayer)
+    registerOnGlobal('getAPlayers', () => aplayers)
 }

@@ -43,13 +43,15 @@ import './global-func'
 import { ready, slideToggle } from '../common/util'
 import about_us from './about_us'
 import preload_screen from './preload_screen'
-import { _$ } from './sakurairo_global'
+import { _$ } from '../common/sakurairo_global'
 import { isSupported } from './compatibility'
 import hitokoto from './hitokoto'
 import { web_audio } from './web_audio'
 import { open, close } from './mobile_nav'
 import { XLS, post_list_show_animation } from './posts'
 import { initThemeColor, updateThemeSkin } from './theme-color'
+import initEffect from './effect'
+
 /**
  * 检查是否应当开启Poi.pjax
  * @seealso https://github.com/PaperStrike/Pjax#compatibility
@@ -69,9 +71,7 @@ loadCSS(mashiro_option.jsdelivr_css_src);
 loadCSS(mashiro_option.entry_content_style_src);
 loadCSS("https://at.alicdn.com/t/font_679578_qyt5qzzavdo39pb9.css");
 
-mashiro_global.variables = new function () {
-    this.skinSecter = true;
-}
+var _mashiro_global_skin_secter = true
 import { initFontControl, loadFontSetting } from './font_control'
 
 function scrollBar() {
@@ -101,7 +101,7 @@ function scrollBar() {
 }
 
 function checkSkinSecter() {
-    if (mashiro_global.variables.skinSecter === false) {
+    if (_mashiro_global_skin_secter === false) {
         const pattern = document.querySelector(".pattern-center"),
             headertop = document.querySelector(".headertop-bar");
         if (pattern) {
@@ -144,7 +144,7 @@ no_right_click();
  */
 async function changeSkin(tagId) {
     //@sideeffect
-    mashiro_global.variables.skinSecter = tagId == "white-bg" || tagId == "dark-bg";
+    _mashiro_global_skin_secter = tagId == "white-bg" || tagId == "dark-bg";
     checkSkinSecter();
     let bg_url;
     switch (tagId) {
@@ -683,8 +683,8 @@ ready(function () {
     preload_screen()
     lazyload();
     powermode()
+    initEffect()
     about_us()
-
 });
 //#region mashiro_global.ini.normalize();
 post_list_show_animation();
