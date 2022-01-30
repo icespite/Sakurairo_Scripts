@@ -1,6 +1,7 @@
 export default async function hitokoto() {
     const yiyan = document.getElementById("footer_yiyan");
-    if (yiyan) {
+    // close yiyan
+    if (false && yiyan) {
         const api_group = mashiro_option.yiyan_api || ["https://api.maho.cc/yiyan/"]
         if (api_group.length == 0) {
             console.warn('一言API: 路径为空')
@@ -18,7 +19,7 @@ export default async function hitokoto() {
     }
 }
 const request = async (api: string) => {
-    const res = await fetch(api, { headers: { Accept: "application/json" } })
+    const res = await fetch(api, {headers: {Accept: "application/json"}})
     if (res.ok) {
         const data = await res.json()
         const from_who = (data.from_who == 'null' ? null : data.from_who) || ''
