@@ -1,10 +1,11 @@
 import { createButterbar } from "../common/butterbar";
 import { __ } from "../common/sakurairo_global";
+import { isMobile } from "./mobile";
 
 let btnSerif: HTMLButtonElement,
     btnSansSerif: HTMLButtonElement;
 function Serif() {
-    if (document.body.clientWidth <= 860) {
+    if (isMobile()) {
         createButterbar(__("将从网络加载字体，流量请注意"));
     }
     document.body.classList.add("serif");
@@ -39,7 +40,7 @@ export function loadFontSetting() {
     }
 }
 function setButtonState(font_name?: string) {
-    if (font_name ?? localStorage.getItem("font_family") == 'sans-serif') {
+    if (font_name || localStorage.getItem("font_family") == 'sans-serif') {
         btnSerif.classList.remove("selected");
         btnSansSerif.classList.add("selected");
     } else {

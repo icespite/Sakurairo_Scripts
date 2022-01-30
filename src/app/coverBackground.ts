@@ -1,6 +1,7 @@
 import { get, set, del } from './cache'
 import { Accept_Image } from './compatibility';
 import { __ } from '../common/sakurairo_global';
+import { isMobile } from './mobile';
 let bgn = 1;
 let blob_url = ''
 export async function nextBG() {

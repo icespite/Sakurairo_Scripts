@@ -28,6 +28,10 @@ declare namespace mashiro_option {
     const jsdelivr_css_src: string
     const land_at_home: boolean
     const live_search: boolean
+    /**
+     * 图片加载占位符
+     */
+    const loading_ph:string
     const qq_api_url: string
     const qzone_autocomplete: boolean
     const random_graphs_mts: boolean
@@ -59,8 +63,11 @@ declare namespace mashiro_option {
     const cache_cover: boolean
     const site_bg_as_cover: boolean
     const float_player_on: boolean
-    const yiyan: boolean
     const yiyan_api: Array<string>
+    /**
+     * 是否从CDN源加载第三方库
+     */
+    const ext_shared_lib: boolean
 }
 declare namespace Poi {
     let pjax: string
@@ -103,3 +110,7 @@ interface Effect {
     amount: number | string
     type: 'sakura' | 'yuki'
 }
+//#region define const
+declare const BUILD_INFO: { hash: string, date: string }
+declare const PRISM_VERSION:string
+//#endregion

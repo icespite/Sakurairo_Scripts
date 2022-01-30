@@ -3,6 +3,7 @@ const webpack = require('webpack')
 const { commitHash } = require('./commit_hash')
 const { VueLoaderPlugin } = require('vue-loader')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const package_info = require('./package_info')
 module.exports = {
     entry: {
         app: './src/app/',
@@ -33,6 +34,14 @@ module.exports = {
             maxInitialRequests: 30,
             //enforceSizeThreshold: 50000,
             cacheGroups: {
+                polyfills: {
+                    test: /[\\/]node_modules[\\/](@babel|core-js|regenerator-runtime)[\\/]/,
+                    name: 'polyfills',
+                    chunks: 'initial',
+                    priority: 60,
+                    enforce: true,
+                    reuseExistingChunk: true
+                },
                 defaultVendors: {
                     test: /[\\/]node_modules[\\/]/,
                     priority: -10,
@@ -100,16 +109,27 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: ['.js', '.json', '.ts'] // 自动判断后缀名，引入时可以不带后缀
+        extensions: ['.js', '.json', '.ts'], // 自动判断后缀名，引入时可以不带后缀
+        fallback: {
+            buffer: require.resolve('buffer'),
+        },
     },
     plugins: [
+        new VueLoaderPlugin(),
+        new MiniCssExtractPlugin(),
         new webpack.BannerPlugin({
             raw: true,
             entryOnly: true,
-            banner: `/*! build ${commitHash} ${new Date().toLocaleDateString()}*/`
+            banner: `/*! build ${commitHash} ${new Date().toLocaleDateString()}*/`,
+            include: 'app'
         }),
-        new VueLoaderPlugin(),
-        new MiniCssExtractPlugin(),
+        new webpack.DefinePlugin({
+            BUILD_INFO: JSON.stringify({
+                hash: commitHash,
+                date: new Date().toLocaleDateString()
+            }),
+            PRISM_VERSION: JSON.stringify(package_info.prismjs)
+        })
         /* new webpack.DefinePlugin({
             'typeof document': JSON.stringify('object'),
             'typeof window': JSON.stringify('object'),

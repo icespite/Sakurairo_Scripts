@@ -7,6 +7,7 @@ import { ready } from "./util"
  * 2.切换cdn时测试对同一个资源访问的表现(未实现)
  * 3.
  * 暂不根据加载速度动态调整cdn
+ * TODO: 使用内置依赖的fallback
  */
 const STORAGE_KEY = 'sakurairo_prefer_cdn'
 const CDN_LIST = [
@@ -23,6 +24,7 @@ function getPreferCDNIndex() {
             localStorage.removeItem(STORAGE_KEY)
             return 0
         }
+        return num
     } else {
         return 0
     }
@@ -81,4 +83,19 @@ async function testCDN() {
         fetch(resolvePathByCDN(cdn, 'dist/baguetteBox.min.css', 'baguettebox.js', '1.11.1'))
     ))
 
+}
+export const importExternal = (path: string, packageName: string, version?: string) => {
+    const script = document.createElement('script')
+    script.src = resolvePath(path, packageName, version)
+    script.async = true
+    //TODO: 超时处理
+    return new Promise((resolve) => {
+        script.onload = resolve
+        script.onerror = () => {
+            console.error(packageName, "加载失败")
+        }
+        document.body.append(script)
+    }).finally(() => {
+        script.onload = script.onerror = null//据说ie上会内存泄露
+    })
 }

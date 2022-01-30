@@ -125,7 +125,8 @@ export function post_list_show_animation() {
     }
 }
 function XLS_Listener(e) {
-    if (e.target === document.querySelector("#pagination a")) {
+    //要求是#pagination只有anchor一个直接子后代
+    if (e.target.parentElement.id == 'pagination') {
         e.preventDefault();
         e.stopPropagation();
         clearTimeout(load_post_timer);
@@ -133,7 +134,7 @@ function XLS_Listener(e) {
     }
 }
 export function XLS() {
-    const intersectionObserver = new IntersectionObserver(function (entries) {
+    const intersectionObserver = new IntersectionObserver((entries) => {
         if (entries[0].intersectionRatio <= 0) return;
         // var page_next = $('#pagination a').attr("href");
         const _page_next = document.querySelector('#pagination a')
@@ -144,9 +145,7 @@ export function XLS() {
                 const load_time = load_key.title;
                 if (load_time != "233") {
                     console.log("%c 自动加载时倒计时 %c", "background:#9a9da2; color:#ffffff; border-radius:4px;", "", "", load_time);
-                    load_post_timer = setTimeout(function () {
-                        load_post();
-                    }, load_time * 1000);
+                    load_post_timer = setTimeout(load_post, load_time * 1000);
                 }
             }
         }

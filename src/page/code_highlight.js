@@ -1,6 +1,6 @@
 import { isInDarkMode } from '../app/darkmode'
 import { loadCSS } from 'fg-loadcss'
-import { resolvePath } from '../common/npmLib';
+import { importExternal, resolvePath } from '../common/npmLib';
 const attributes = {
     'autocomplete': 'off',
     'autocorrect': 'off',
@@ -45,7 +45,7 @@ const hljs_click_callback = (e) => {
     }
     document.documentElement.classList.toggle('code-block-fullscreen-html-scroll');
 }
-export function deattchHljsCallback() {
+export function deattachHljsCallback() {
     document.body.removeEventListener("click", hljs_click_callback)
 }
 export async function hljs_process(pre, code) {
@@ -64,13 +64,13 @@ export async function hljs_process(pre, code) {
     }
 }
 //Prism
-const PrismBaseUrl = mashiro_option.code_highlight_prism?.autoload_path ?? resolvePath('','prismjs','1.25.0')
+const PrismBaseUrl = mashiro_option.code_highlight_prism?.autoload_path || resolvePath('', 'prismjs', PRISM_VERSION)
 let currentPrismThemeCSS = undefined
 const themeCSS = (() => {
-    const { light, dark } = mashiro_option.code_highlight_prism?.theme ?? {}
+    const { light, dark } = mashiro_option.code_highlight_prism?.theme || {}
     const theme = {
-        light: light ?? 'themes/prism.min.css',
-        dark: dark ?? 'themes/prism-tomorrow.min.css',
+        light: light || 'themes/prism.min.css',
+        dark: dark || 'themes/prism-tomorrow.min.css',
     }
     for (const theme_name in theme) {
         theme[theme_name] = new URL(theme[theme_name], PrismBaseUrl).toString()
@@ -105,7 +105,13 @@ async function importPrismJS() {
             //必备插件全家桶
             loadCSS(new URL('plugins/toolbar/prism-toolbar.min.css', PrismBaseUrl).toString())
             loadCSS(new URL('plugins/previewers/prism-previewers.min.css', PrismBaseUrl).toString())
-            await import('./prism_pack')
+            if (mashiro_option.ext_shared_lib) {
+                await Promise.all([importExternal('components/prism-core.min.js', 'prismjs', PRISM_VERSION),
+                importExternal('plugins/autoloader/prism-autoloader.min.js', 'prismjs', PRISM_VERSION),
+                importExternal('plugins/toolbar/prism-toolbar.min.js', 'prismjs', PRISM_VERSION),
+                importExternal('plugins/previewers/prism-previewers.min.js', 'prismjs', PRISM_VERSION),
+                importExternal('plugins/show-language/prism-show-language.min.js', 'prismjs', PRISM_VERSION)])
+            } else await import('./prism_pack')
             Prism.plugins.autoloader.languages_path = new URL('components/', PrismBaseUrl).toString()
         }
     } catch (reason) {
@@ -114,11 +120,19 @@ async function importPrismJS() {
 }
 function loadPrismPluginLineNumbers() {
     loadCSS(new URL('plugins/line-numbers/prism-line-numbers.min.css', PrismBaseUrl).toString())
-    return import('prismjs/plugins/line-numbers/prism-line-numbers')
+    if (mashiro_option.ext_shared_lib) {
+        return importExternal('plugins/line-numbers/prism-line-numbers.min.js', 'prismjs', PRISM_VERSION)
+    } else {
+        return import('prismjs/plugins/line-numbers/prism-line-numbers')
+    }
 }
 function loadPrismMatchBraces() {
     loadCSS(new URL('plugins/match-braces/prism-match-braces.min.css', PrismBaseUrl).toString())
-    return import('prismjs/plugins/match-braces/prism-match-braces')
+    if (mashiro_option.ext_shared_lib) {
+        return importExternal('plugins/match-braces/prism-match-braces.min.js', 'prismjs', PRISM_VERSION)
+    } else {
+        return import('prismjs/plugins/match-braces/prism-match-braces')
+    }
 }
 /**
  * 

@@ -5,16 +5,18 @@ import { createButterbar } from '../common/butterbar'
 import './global-func'
 import getqqinfo from './getqqinfo'
 import addComment from './AddComment'
-import { hljs_process, prism_process, deattachPrismCallback, deattchHljsCallback } from './code_highlight'
+import { hljs_process, prism_process, deattachPrismCallback, deattachHljsCallback } from './code_highlight'
 import { _$, __ } from '../common/sakurairo_global'
 import load_bangumi from './bangumi'
+import { importExternal } from '../common/npmLib'
+import debounce from '@mui/utils/debounce'
 async function code_highlight_style() {
     const pre = document.getElementsByTagName("pre"),
         code = document.querySelectorAll("pre code");
     if (!pre.length) {
         switch (mashiro_option.code_highlight) {
             case 'hljs':
-                deattchHljsCallback()
+                deattachHljsCallback()
                 return
             case 'prism':
                 deattachPrismCallback()
@@ -39,8 +41,13 @@ async function code_highlight_style() {
             code[j].setAttribute('id', 'code-block-' + j);
             code[j].insertAdjacentHTML('afterend', '<a class="copy-code" href="javascript:" data-clipboard-target="#code-block-' + j + '" title="' + __("拷贝代码") + '"><i class="fa fa-clipboard" aria-hidden="true"></i>');
         };
-        const { default: ClipboardJS } = await import('clipboard')
-        new ClipboardJS('.copy-code');
+        if (mashiro_option.ext_shared_lib) {
+            await importExternal('dist/clipboard.min.js', 'clipboard')
+            new ClipboardJS('.copy-code')
+        } else {
+            const ClipboardJS = (await import('clipboard')).default
+            new ClipboardJS('.copy-code');
+        }
     }
 }
 function click_to_view_image() {
@@ -121,7 +128,7 @@ function XCS() {
                         //temp.parentNode.removeChild(temp)
                     }
                 } else {
-                    createButterbar(data ?? 'HTTP' + resp.status + ':' + resp.statusText);
+                    createButterbar(data || 'HTTP' + resp.status + ':' + resp.statusText);
                 }
             }).catch(reason => {
                 createButterbar(reason);
@@ -291,7 +298,7 @@ function resizeTOC() {
         }
         resize()
         //TODO:性能
-        window.addEventListener('resize', resize, { passive: true })
+        window.addEventListener('resize', debounce(resize), { passive: true })
     }
 }
 function tableOfContentScroll(flag) {
@@ -305,7 +312,15 @@ function tableOfContentScroll(flag) {
         }
     } else {
         if (flag && document.getElementsByClassName('toc').length > 0) {
-            const reqTocbot = import('tocbot')
+            import('tocbot').then(({ default: tocbot }) => {
+                tocbot.init({
+                    tocSelector: '.toc',
+                    contentSelector: ['.entry-content', '.links'],
+                    headingSelector: 'h1,h2,h3,h4,h5',
+                    headingsOffset: heading_fix - window.innerHeight / 2,
+                    onClick: null
+                });
+            })
             const heading_fix = mashiro_option.entry_content_style == "sakurairo" ? (document.querySelector("article.type-post") ? (document.querySelector("div.pattern-attachment") ? -75 : 200) : 375) : window.innerHeight / 2;
             const _els = document.querySelectorAll('.entry-content,.links');
             const idSet = new Set()
@@ -322,15 +337,6 @@ function tableOfContentScroll(flag) {
                     }
                 }
             }
-            reqTocbot.then(({ default: tocbot }) => {
-                tocbot.init({
-                    tocSelector: '.toc',
-                    contentSelector: ['.entry-content', '.links'],
-                    headingSelector: 'h1,h2,h3,h4,h5',
-                    headingsOffset: heading_fix - window.innerHeight / 2,
-                    onClick: null
-                });
-            })
         }
     }
 }
@@ -372,7 +378,7 @@ function attach_image() {
                     let res = JSON.parse(xhr.responseText);
                     if (res.status == 200) {
                         let get_the_url = res.proxy;
-                        document.getElementById("upload-img-show").insertAdjacentHTML('afterend', '<img class="lazyload upload-image-preview" src="https://cdn.jsdelivr.net/gh/Fuukei/Public_Repository@latest/vision/theme/colorful/load/inload.svg" data-src="' + get_the_url + '" onclick="window.open(\'' + get_the_url + '\')" onerror="imgError(this)" />');
+                        document.getElementById("upload-img-show").insertAdjacentHTML('afterend', '<img class="lazyload upload-image-preview" src="' + mashiro_option.loading_ph + '" data-src="' + get_the_url + '" onclick="window.open(\'' + get_the_url + '\')" onerror="imgError(this)" />');
                         lazyload();
                         createButterbar(__("图片上传成功~"));
                         grin(get_the_url, type = 'Img');

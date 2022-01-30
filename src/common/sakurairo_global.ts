@@ -13,7 +13,8 @@ export type I18nFunction = (defaultStr: string) => string
 export interface SakurairoGlobal {
     opt: SakurairoOption
 /*     _sys_call:typeof sys_call
- */}
+ */, build: any,
+}
 /**
  * 
  * @param key 这段句子的中文表述（默认语言）
@@ -33,24 +34,26 @@ export const _$ = (defaultStr: string, ...replacements: string[]) => {
     }
     return template
 }
-export type SakurairoI18n  = Record<string, string>
+export type SakurairoI18n = Record<string, string>
 
 export const sakurairoGlobal: SakurairoGlobal = {
     opt: {},
-/*     _sys_call:sys_call
- */}
- 
- /**
-  * 在sakurairoGlobal注册一个对象
-  * @param key 
-  * @param value 
-  * @returns 
-  */
-export const registerOnGlobal = (key:string,value:any)=>
-    Object.defineProperty(sakurairoGlobal,key,{
-        value:value,
-        writable:false,
-        enumerable:true,
+    /*     _sys_call:sys_call
+     */
+    build: BUILD_INFO
+}
+
+/**
+ * 在sakurairoGlobal注册一个对象
+ * @param key 
+ * @param value 
+ * @returns 
+ */
+export const registerOnGlobal = (key: string, value: any) =>
+    Object.defineProperty(sakurairoGlobal, key, {
+        value: value,
+        writable: false,
+        enumerable: true,
     })
 
 if ('_sakurairo' in window) {
@@ -60,6 +63,6 @@ if ('_sakurairo' in window) {
         sakurairoGlobal.opt = _sakurairo.opt
     }
 }
-declare const _sakurairoi18n:SakurairoI18n
+declare const _sakurairoi18n: SakurairoI18n
 //@ts-ignore
 window._sakurairo = sakurairoGlobal
