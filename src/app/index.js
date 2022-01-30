@@ -1,37 +1,37 @@
 /**
  * app.js - Client script bundle for Sakurairo, a WordPress theme.
- * @author bymoye 
+ * @author bymoye
  * @author KotoriK
  * @license GPL-v2
  * @date 2021.3.21
  * Github Repository:
  * @url https://github.com/Fuukei/Sakurairo_Scripts
  * @url https://github.com/mirai-mamori/Sakurairo commit f7db3c5
- * 
- * *** ACKNOWLEDGEMENT *** 
- * 
+ *
+ * *** ACKNOWLEDGEMENT ***
+ *
  * *** modified on mashirozx/Sakura/js/sakura-app.js ***
  * Sakura theme application bundle
  * @author Mashiro
  * @url https://2heng.xin
  * @date 2019.8.3
  * *** ***
- * 
+ *
  * *** inherited from louie-senpai/Siren/js/app.js ***
  * Siren application js
  * @author Louie
  * @url http://i94.me
  * @date 2016.11.19
  * *** ***
- * 
+ *
  * inherited from Xoin-Yang/Akina/js/global.js
  * @author Xoin-Yang
  * @date 2017.04.25
  * @url http://www.akina.pw/
- * *** END OF ACKNOWLEDGEMENT *** 
- * 
+ * *** END OF ACKNOWLEDGEMENT ***
+ *
  * Press 'F' to pay respects.
- * 
+ *
  */
 
 import { getCurrentBG, } from './coverBackground'
@@ -161,7 +161,7 @@ ready(function () {
     preload_screen()
     lazyload();
     powermode()
-    about_us()
+    // about_us()
 });
 //#region mashiro_global.ini.normalize();
 post_list_show_animation();
